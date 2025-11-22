@@ -38,8 +38,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copia apenas os arquivos necessários do estágio 'builder'
-COPY --from=builder /app/public ./public
 
 # Configura permissões para o cache do Next.js
 RUN mkdir .next
