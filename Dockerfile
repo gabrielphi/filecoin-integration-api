@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Instala dependências (ci é mais rápido e seguro para CI/CD/Docker)
-RUN npm ci
+RUN npm install
 
 # --- Estágio 2: Builder ---
 # Constrói o código Next.js

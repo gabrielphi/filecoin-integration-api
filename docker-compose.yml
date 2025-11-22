@@ -12,13 +12,17 @@ services:
       - PRIVATE_KEY=${PRIVATE_KEY}
       # Ajustes de performance do Node.js para containers
       - NODE_OPTIONS='--max-old-space-size=4096'
+      - API_KEY=${API_KEY}
     deploy:
       resources:
         limits:
           memory: 1G
     networks:
       - web3_net
+      - npm_public
 
 networks:
   web3_net:
     driver: bridge
+  npm_public:
+    external: true
