@@ -1,0 +1,24 @@
+services:
+  synapse-api:
+    container_name: synapse-filecoin-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # A chave será lida do seu arquivo .env local ou do shell
+      - PRIVATE_KEY=${PRIVATE_KEY}
+      # Ajustes de performance do Node.js para containers
+      - NODE_OPTIONS='--max-old-space-size=4096'
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    networks:
+      - web3_net
+
+networks:
+  web3_net:
+    driver: bridge
