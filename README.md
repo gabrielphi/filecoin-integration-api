@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌉 Synapse Vault: Frictionless Web3 Storage Bridge
 
-## Getting Started
+![Architecture](https://img.shields.io/badge/Architecture-Middleware_Pattern-blueviolet?style=for-the-badge)
+![FVM Integration](https://img.shields.io/badge/FVM-Deep_Integration-blue?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Deploy-Production_Ready-2496ED?style=for-the-badge)
 
-First, run the development server:
+# Infrastructure Provisioning (Pre-Flight) 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Before starting the container (**Runtime**), it is necessary to provision the on-chain identity and liquidity that the Gateway will use to operate the "Gas Station" pattern.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 1. Wallet Setup (Identity) 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The system requires an EVM-Compatible Wallet (such as MetaMask) to act as the paying agent. Configure your wallet with the following network details:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Parameter | Value |
+| :--- | :--- |
+| **Network** | Filecoin Calibration Testnet |
+| **Chain ID** | `314159` |
+| **Currency Symbol** | tFIL |
+| **RPC URL** | `https://api.calibration.node.glif.io/rpc/v1` |
 
-## Learn More
+## 2. Liquidity Injection (Gas & Storage) 
 
-To learn more about Next.js, take a look at the following resources:
+The **Synapse Vault** operates with two distinct assets on the FVM (Filecoin Virtual Machine). The wallet must be funded in advance to ensure operation:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Asset | Technical Function | Source (Faucets) |
+| :--- | :--- | :--- |
+| **tFIL** | **Gas Fees:** Pays for FVM computation and network messages. | [Calibration Faucet (Filfox)](https://faucet.calibration.filfox.info/) |
+| **USDFC** | **Storage Payment:** ERC-20 token used in the Synapse contract to pay for disk space. | [USDFC Faucet Link](https://forest-explorer.chainsafe.dev/faucet/calibnet_usdfc) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
+> **Note:** Ensure the wallet has sufficient balance of both assets before triggering initialization scripts.
 
-## Deploy on Vercel
+> **Bridging the Gap.** A production-ready middleware that enables any Web2 enterprise system to utilize Filecoin's decentralized storage without managing wallets, gas fees, or cryptographic signatures.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎯 The Strategic Value
+**The Barrier:** Enterprise adoption of Filecoin is hindered by the complexity of client-side wallet management, gas estimation (tFIL), and storage payment (USDFC) mechanics.
+**Our Solution:** A containerized **"Gas Station & Gateway"** pattern. We abstract the Synapse Protocol into a high-performance REST API.
+
+* **Client Experience:** Sends JSON (Base64). Receives CID. **Zero blockchain knowledge required.**
+* **Backend Engineering:** Handles atomic locking, allowance approvals, and sector sealing automatically.
+
+---
+
+## 🏗️ Architecture & Implementation
+
+We leveraged **Next.js 16 (Server Actions)** wrapped in **Docker** to create a secure execution environment for the **Synapse SDK**.
+
+```mermaid
+graph LR
+    A[Web2 Client / Legacy App] -->|POST JSON + API_KEY| B(Docker Container)
+    subgraph "Synapse Vault Core"
+    B -->|1. Auth & Validation| C{Middleware}
+    C -->|2. Load Isolated Wallet| D[Synapse SDK Instance]
+    D -->|3. Check USDFC/tFIL Liquidity| E[Payment Logic]
+    E -->|4. Atomic Approval (FVM)| F[Smart Contract]
+    D -->|5. Upload & Seal| G[Storage Provider]
+    end
+    G -->|6. Return PieceCID| A
